@@ -487,6 +487,55 @@ describe("DashCard", () => {
     expect(screen.getByText("Hello, world!")).toBeVisible();
   });
 
+  describe("card style", () => {
+    it("should paint the chosen background color and opacity", () => {
+      const styledDashcard = createMockDashboardCard({
+        ...tableDashcard,
+        visualization_settings: {
+          "dashcard.background_color": "#509EE3",
+          "dashcard.background_opacity": 40,
+        },
+      });
+      setup({
+        dashcard: styledDashcard,
+        dashcardData: {
+          [styledDashcard.id]: tableDashcardData[tableDashcard.id],
+        },
+      });
+
+      const dashcard = screen.getByTestId("dashcard");
+      expect(dashcard).toHaveStyle({
+        "--dashcard-background-color": "#509EE3",
+        "--dashcard-background-opacity": "0.4",
+      });
+    });
+
+    it("should not paint a background when the card background is turned off", () => {
+      const baseTextCard = createMockTextDashboardCard({
+        text: "Hello, world!",
+      });
+      const textCard = {
+        ...baseTextCard,
+        visualization_settings: {
+          ...baseTextCard.visualization_settings,
+          "dashcard.background": false,
+          "dashcard.background_color": "#509EE3",
+        },
+      };
+      setup({
+        dashboard: { ...testDashboard, dashcards: [textCard] },
+        dashcard: textCard,
+        dashcardData: {},
+      });
+
+      expect(
+        screen
+          .getByTestId("dashcard")
+          .style.getPropertyValue("--dashcard-background-color"),
+      ).toBe("");
+    });
+  });
+
   it("should show a heading card", () => {
     const textCard = createMockHeadingDashboardCard({
       text: "What a cool section",

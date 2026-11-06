@@ -59,6 +59,7 @@ import type {
   DashCardOnChangeCardAndRunHandler,
 } from "./types";
 import { useAutoScrollIntoView } from "./use-auto-scroll-into-view";
+import { getDashCardStyle } from "./utils";
 
 function preventDragging(event: React.SyntheticEvent) {
   event.stopPropagation();
@@ -257,6 +258,16 @@ function DashCardInner({
     );
   }, [isEditing, isAction, mainCard]);
 
+  const cardStyle = useMemo(
+    () => getDashCardStyle(mainCard.visualization_settings),
+    [mainCard.visualization_settings],
+  );
+
+  const customBackground =
+    hasHiddenBackground || shouldForceHiddenBackground
+      ? null
+      : cardStyle.background;
+
   const headerIcon = useMemo(() => {
     const { isRegularCollection } = PLUGIN_COLLECTIONS;
     const isRegularQuestion = isRegularCollection({
@@ -374,14 +385,29 @@ function DashCardInner({
             [S.shouldForceHiddenBackground]: shouldForceHiddenBackground,
             [S.isEmbeddingSdk]: isEmbeddingSdk(),
             [S.isAction]: isAction,
+            [S.hasCustomBackground]: customBackground !== null,
+            [S.borderBold]: cardStyle.border === "bold",
+            [S.borderNone]: cardStyle.border === "none",
+            [S.shadowSm]: cardStyle.shadow === "sm",
+            [S.shadowMd]: cardStyle.shadow === "md",
+            [S.shadowLg]: cardStyle.shadow === "lg",
           },
           className,
         )}
         style={(theme) => {
           const { border } = theme.other.dashboard.card;
-          if (border) {
-            return { border };
-          }
+          const backgroundVariables = customBackground
+            ? {
+                "--dashcard-background-color": customBackground.color,
+                "--dashcard-background-opacity": customBackground.opacity,
+              }
+            : {};
+          const shouldUseThemeBorder = border && cardStyle.border === "default";
+
+          return {
+            ...backgroundVariables,
+            ...(shouldUseThemeBorder ? { border } : {}),
+          };
         }}
         ref={cardRootRef}
       >

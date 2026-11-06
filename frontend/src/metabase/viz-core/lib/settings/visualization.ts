@@ -23,6 +23,7 @@ import {
 } from "../settings";
 
 import { trackCardSetToHideWhenNoResults } from "./analytics";
+import { DASHCARD_STYLE_SETTINGS } from "./dashcard-style";
 
 const COMMON_SETTINGS: VisualizationSettingsDefinitions = {
   "card.title": {
@@ -60,6 +61,7 @@ const COMMON_SETTINGS: VisualizationSettingsDefinitions = {
     },
   },
   click_behavior: {},
+  ...DASHCARD_STYLE_SETTINGS,
 };
 
 export function getSettingDefinitionsForDisplay(

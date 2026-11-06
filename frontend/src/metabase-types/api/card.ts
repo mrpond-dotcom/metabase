@@ -609,8 +609,26 @@ export type VisualizationSettings = {
   /** Draw timeline events on time series charts. */
   "timeline_events.enabled"?: boolean;
 
+  /** Dashboard card background color. When unset, the theme's card background is used. */
+  "dashcard.background_color"?: string;
+
+  /** Dashboard card background opacity as a percentage from 0 to 100. */
+  "dashcard.background_opacity"?: number;
+
+  /** Dashboard card border style. */
+  "dashcard.border"?: DashCardBorderStyle;
+
+  /** Dashboard card drop shadow size. */
+  "dashcard.shadow"?: DashCardShadowSize;
+
   [key: string]: any;
 } & EmbedVisualizationSettings;
+
+export const DASHCARD_BORDER_STYLES = ["default", "bold", "none"] as const;
+export type DashCardBorderStyle = (typeof DASHCARD_BORDER_STYLES)[number];
+
+export const DASHCARD_SHADOW_SIZES = ["none", "sm", "md", "lg"] as const;
+export type DashCardShadowSize = (typeof DASHCARD_SHADOW_SIZES)[number];
 
 export type EmbedVisualizationSettings = {
   iframe?: string;

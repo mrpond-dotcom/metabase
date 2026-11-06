@@ -30,6 +30,47 @@
     border: none !important;
   }
 
+  /* Painting the background on a layer lets its opacity change without fading the card's content. */
+  &.hasCustomBackground {
+    background-color: transparent;
+    isolation: isolate;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: inherit;
+      background-color: var(
+        --dashcard-background-color,
+        var(--mb-color-bg-dashboard-card)
+      );
+      opacity: var(--dashcard-background-opacity, 1);
+      pointer-events: none;
+    }
+  }
+
+  &.borderBold {
+    border-width: 2px;
+    border-color: var(--mb-color-border-neutral-strongest);
+  }
+
+  &.borderNone {
+    border: none;
+  }
+
+  &.shadowSm {
+    box-shadow: var(--mantine-shadow-sm);
+  }
+
+  &.shadowMd {
+    box-shadow: var(--mantine-shadow-md);
+  }
+
+  &.shadowLg {
+    box-shadow: var(--mantine-shadow-lg);
+  }
+
   &.hasHiddenBackground {
     border: 0 !important;
     background: transparent !important;
