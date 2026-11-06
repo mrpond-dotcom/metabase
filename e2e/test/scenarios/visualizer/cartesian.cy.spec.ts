@@ -414,7 +414,8 @@ describe("scenarios > visualizer > cartesian", () => {
       assertDataSourceColumnSelected("Product → Category");
       H.chartLegendItems().should("have.length", 5);
       H.verticalWell().findAllByTestId("well-item").should("have.length", 1);
-      H.horizontalWell().findAllByTestId("well-item").should("have.length", 2);
+      H.horizontalWell().findAllByTestId("well-item").should("have.length", 1);
+      H.legendWell().findByText("Legend: Product → Category").should("exist");
 
       // Add Average of Quantity column
       H.dataSourceColumn(PIVOT_TABLE_CARD.name, "Average of Quantity").click();
@@ -424,7 +425,8 @@ describe("scenarios > visualizer > cartesian", () => {
       assertDataSourceColumnSelected("Product → Category");
       H.chartLegendItems().should("have.length", 5);
       H.verticalWell().findAllByTestId("well-item").should("have.length", 2);
-      H.horizontalWell().findAllByTestId("well-item").should("have.length", 2);
+      H.horizontalWell().findAllByTestId("well-item").should("have.length", 1);
+      H.legendWell().findByText("Legend: Product → Category").should("exist");
 
       // Remove dimensions
       H.deselectColumnFromColumnsList(

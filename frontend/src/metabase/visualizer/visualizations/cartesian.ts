@@ -118,6 +118,16 @@ export const cartesianDropHandler = (
     }
   }
 
+  if (over.id === DROPPABLE_ID.LEGEND_WELL) {
+    setLegendColumnForCartesianChart(
+      state,
+      settings,
+      column,
+      columnRef,
+      dataSource,
+    );
+  }
+
   if (over.id === DROPPABLE_ID.SCATTER_BUBBLE_SIZE_WELL) {
     replaceMetricColumnAsScatterBubbleSize(
       state,
@@ -227,6 +237,84 @@ export function addDimensionColumnToCartesianChart(
     ...state.settings,
     "graph.dimensions": [...dimensions, newDimension.name].filter(Boolean),
   };
+}
+
+/**
+ * Whether a single-source cartesian chart can split its series by `column`.
+ * Breaking a chart out by a second dimension needs an x-axis dimension to
+ * split, and Metabase can only split a chart that shows one metric.
+ */
+export function canSetLegendColumnForCartesianChart(
+  state: Pick<
+    VisualizerVizDefinitionWithColumns,
+    "display" | "settings" | "columnValuesMapping"
+  >,
+  settings: ComputedVisualizationSettings,
+  column: DatasetColumn,
+): boolean {
+  if (
+    !state.display ||
+    !isCartesianChart(state.display) ||
+    state.display === "scatter" ||
+    shouldSplitVisualizerSeries(state.columnValuesMapping)
+  ) {
+    return false;
+  }
+
+  const dimensions =
+    state.settings["graph.dimensions"] ?? settings["graph.dimensions"] ?? [];
+  const metrics =
+    state.settings["graph.metrics"] ?? settings["graph.metrics"] ?? [];
+  const isSuitableColumn = getDefaultDimensionFilter(state.display);
+
+  return (
+    dimensions.length > 0 && metrics.length <= 1 && isSuitableColumn(column)
+  );
+}
+
+/**
+ * Splits a cartesian chart into one colored series per value of `column`,
+ * replacing the column it was split by before.
+ */
+export function setLegendColumnForCartesianChart(
+  state: VisualizerVizDefinitionWithColumns,
+  settings: ComputedVisualizationSettings,
+  column: DatasetColumn,
+  columnRef: VisualizerColumnReference,
+  dataSource: VisualizerDataSource,
+) {
+  if (!canSetLegendColumnForCartesianChart(state, settings, column)) {
+    return;
+  }
+
+  const [xAxisDimension, previousLegendDimension] =
+    state.settings["graph.dimensions"] ?? settings["graph.dimensions"] ?? [];
+  if (columnRef.name === xAxisDimension) {
+    return;
+  }
+
+  const isAlreadyAdded = state.columns.some(
+    (col) => col.name === columnRef.name,
+  );
+  if (!isAlreadyAdded) {
+    state.columns.push(
+      copyColumn(columnRef.name, column, dataSource.name, state.columns),
+    );
+    state.columnValuesMapping[columnRef.name] = [columnRef];
+  }
+
+  state.settings = {
+    ...state.settings,
+    "graph.dimensions": [xAxisDimension, columnRef.name],
+  };
+
+  if (previousLegendDimension && previousLegendDimension !== columnRef.name) {
+    removeColumnFromStateUnlessUsedElseWhere(state, previousLegendDimension, [
+      "graph.metrics",
+      "graph.dimensions",
+      "scatter.bubble",
+    ]);
+  }
 }
 
 /**
