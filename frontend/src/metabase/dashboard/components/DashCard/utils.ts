@@ -4,12 +4,19 @@ import { getVirtualCardType } from "metabase/dashboard/utils";
 import type {
   BaseDashboardCard,
   Card,
+  DashCardBorderStyle,
   DashCardDataSeries,
   DashCardSeriesItem,
+  DashCardShadowSize,
+  VisualizationSettings,
   VisualizerColumnValueSource,
   VisualizerDataSourceId,
   VisualizerSeriesItem,
   VisualizerVizDefinition,
+} from "metabase-types/api";
+import {
+  DASHCARD_BORDER_STYLES,
+  DASHCARD_SHADOW_SIZES,
 } from "metabase-types/api";
 import {
   isVirtualCard,
@@ -96,4 +103,66 @@ export function getCardsFromSeries(
     cards.push(card);
   }
   return cards;
+}
+
+const MAX_BACKGROUND_OPACITY_PERCENT = 100;
+
+type DashCardStyleSettingKey = keyof Pick<
+  VisualizationSettings,
+  | "dashcard.border"
+  | "dashcard.shadow"
+  | "dashcard.background_color"
+  | "dashcard.background_opacity"
+>;
+
+export interface DashCardStyle {
+  border: DashCardBorderStyle;
+  shadow: DashCardShadowSize;
+  /** `null` when the card keeps the theme background. */
+  background: {
+    /** `undefined` keeps the theme color and only changes its opacity. */
+    color: string | undefined;
+    /** Between 0 and 1. */
+    opacity: number;
+  } | null;
+}
+
+/**
+ * Reads the user's "Card style" settings, ignoring stored values that are not
+ * valid so a bad value falls back to the default look.
+ */
+export function getDashCardStyle(
+  settings: Partial<Record<DashCardStyleSettingKey, unknown>>,
+): DashCardStyle {
+  const border =
+    DASHCARD_BORDER_STYLES.find(
+      (style) => style === settings["dashcard.border"],
+    ) ?? "default";
+  const shadow =
+    DASHCARD_SHADOW_SIZES.find(
+      (size) => size === settings["dashcard.shadow"],
+    ) ?? "none";
+
+  const storedColor = settings["dashcard.background_color"];
+  const color =
+    typeof storedColor === "string" && storedColor.length > 0
+      ? storedColor
+      : undefined;
+
+  const storedOpacity = settings["dashcard.background_opacity"];
+  const opacityPercent =
+    typeof storedOpacity === "number" && Number.isFinite(storedOpacity)
+      ? Math.min(Math.max(storedOpacity, 0), MAX_BACKGROUND_OPACITY_PERCENT)
+      : MAX_BACKGROUND_OPACITY_PERCENT;
+
+  const hasCustomBackground =
+    color !== undefined || opacityPercent < MAX_BACKGROUND_OPACITY_PERCENT;
+
+  return {
+    border,
+    shadow,
+    background: hasCustomBackground
+      ? { color, opacity: opacityPercent / MAX_BACKGROUND_OPACITY_PERCENT }
+      : null,
+  };
 }

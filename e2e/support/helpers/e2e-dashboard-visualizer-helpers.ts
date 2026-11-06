@@ -270,6 +270,10 @@ export function horizontalWell() {
   return cy.findByTestId("horizontal-well");
 }
 
+export function legendWell() {
+  return cy.findByTestId("legend-well");
+}
+
 export function pieMetricWell() {
   return cy.findByTestId("pie-metric-well");
 }

@@ -8,6 +8,7 @@ import { isNotNull } from "metabase/utils/types";
 import { DRAGGABLE_ID, DROPPABLE_ID } from "metabase/visualizer/constants";
 import { useCanHandleActiveItem } from "metabase/visualizer/hooks/use-can-handle-active-item";
 import {
+  getHasLegendWell,
   getIsMultiseriesCartesianChart,
   getVisualizationType,
   getVisualizerComputedSettings,
@@ -28,6 +29,7 @@ export function CartesianHorizontalWell({ style, ...props }: FlexProps) {
   const computedSettings = useSelector(getVisualizerComputedSettings);
   const columns = useSelector(getVisualizerDatasetColumns);
   const isMultiseries = useSelector(getIsMultiseriesCartesianChart);
+  const hasLegendWell = useSelector(getHasLegendWell);
   const dispatch = useDispatch();
 
   const { active, setNodeRef, isOver } = useDroppable({
@@ -43,6 +45,11 @@ export function CartesianHorizontalWell({ style, ...props }: FlexProps) {
   }, [columns, computedSettings, rawSettings, isMultiseries]);
 
   const dimensions = useMemo(() => {
+    if (hasLegendWell) {
+      // the second dimension splits the series and is shown in the Legend well
+      return allDimensions.filter((_dimension, index) => index !== 1);
+    }
+
     if (!isMultiseries) {
       return allDimensions;
     }
@@ -61,7 +68,7 @@ export function CartesianHorizontalWell({ style, ...props }: FlexProps) {
     }
 
     return dimensions;
-  }, [allDimensions, isMultiseries]);
+  }, [allDimensions, hasLegendWell, isMultiseries]);
 
   const isSuitableColumn = useMemo(() => {
     return display ? getDefaultDimensionFilter(display) : () => false;

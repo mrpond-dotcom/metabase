@@ -120,6 +120,20 @@ export const getIsMultiseriesCartesianChart = createSelector(
     shouldSplitVisualizerSeries(columnValuesMapping),
 );
 
+/**
+ * Single-source cartesian charts get a Legend well for the dimension that
+ * splits them into colored series. Scatter charts and charts combining
+ * several sources already use their extra dimensions for other things.
+ */
+export const getHasLegendWell = createSelector(
+  [getVisualizationType, getIsMultiseriesCartesianChart],
+  (display, isMultiseries) =>
+    display != null &&
+    isCartesianChart(display) &&
+    display !== "scatter" &&
+    !isMultiseries,
+);
+
 const getVisualizerDatasetData = createSelector(
   [
     getUsedDataSources,

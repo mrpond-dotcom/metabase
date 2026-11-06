@@ -19,6 +19,7 @@ import {
 } from "metabase/ui";
 import Visualization from "metabase/visualizations/components/Visualization";
 import {
+  getHasLegendWell,
   getIsLoading,
   getVisualizationType,
   getVisualizerRawSeries,
@@ -32,6 +33,7 @@ import { trackVisualizerViewAsTableClicked } from "../analytics";
 
 import S from "./VisualizationCanvas.module.css";
 import { HorizontalWell } from "./wells/HorizontalWell";
+import { LegendWell } from "./wells/LegendWell";
 import { ScatterFloatingWell } from "./wells/ScatterFloatingWell";
 import { VerticalWell } from "./wells/VerticalWell";
 
@@ -59,6 +61,7 @@ export function VisualizationCanvas({ className }: VisualizationCanvasProps) {
 
   const display = useSelector(getVisualizationType);
   const isLoading = useSelector(getIsLoading);
+  const hasLegendWell = useSelector(getHasLegendWell);
 
   let rawSeries = useSelector(getVisualizerRawSeries);
   if (display && isCartesianChart(display)) {
@@ -141,6 +144,11 @@ export function VisualizationCanvas({ className }: VisualizationCanvasProps) {
         {display === "scatter" && (
           <Box style={{ gridArea: "top" }}>
             <ScatterFloatingWell />
+          </Box>
+        )}
+        {hasLegendWell && (
+          <Box style={{ gridArea: "top" }}>
+            <LegendWell />
           </Box>
         )}
         <Center

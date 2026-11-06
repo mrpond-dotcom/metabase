@@ -23,6 +23,7 @@ import {
 } from "../settings";
 
 import { trackCardSetToHideWhenNoResults } from "./analytics";
+import { DASHCARD_STYLE_SETTINGS } from "./dashcard-style";
 
 const COMMON_SETTINGS: VisualizationSettingsDefinitions = {
   "card.title": {
@@ -59,7 +60,18 @@ const COMMON_SETTINGS: VisualizationSettingsDefinitions = {
       trackCardSetToHideWhenNoResults(extra.dashboardId);
     },
   },
+  "dashcard.auto_crossfilter": {
+    get title() {
+      return t`Filter the dashboard when a value is clicked`;
+    },
+    widget: "toggle",
+    inline: true,
+    dashboard: true,
+    getDefault: () => true,
+    getHidden: ([{ card }]: Series) => isVirtualDashCard(card),
+  },
   click_behavior: {},
+  ...DASHCARD_STYLE_SETTINGS,
 };
 
 export function getSettingDefinitionsForDisplay(
