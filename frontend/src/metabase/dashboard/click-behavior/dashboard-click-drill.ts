@@ -26,6 +26,7 @@ import type {
   ParameterValueOrArray,
 } from "metabase-types/api";
 
+import { getAutoCrossfilterClickBehavior } from "./auto-crossfilter";
 import { getStructuredQuestionUrlWithParameters } from "./question-url";
 import type {
   ClickBehaviorClickObject,
@@ -197,9 +198,15 @@ export function getClickBehavior(
     : undefined;
 
   if (dashcard) {
-    return hasColumnLevelClickBehavior(dashcard)
+    const configuredClickBehavior = hasColumnLevelClickBehavior(dashcard)
       ? columnSettings?.click_behavior
       : settings.click_behavior;
+
+    return (
+      configuredClickBehavior ??
+      getAutoCrossfilterClickBehavior(clicked) ??
+      undefined
+    );
   }
 
   // Standalone SDK questions can have column links without a dashboard card.

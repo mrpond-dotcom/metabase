@@ -618,6 +618,12 @@ export type VisualizationSettings = {
   /** Dashboard card border style. */
   "dashcard.border"?: DashCardBorderStyle;
 
+  /**
+   * When the card has no click behavior of its own, clicking a value sets the
+   * dashboard filters wired to that column. Treated as on when unset.
+   */
+  "dashcard.auto_crossfilter"?: boolean;
+
   /** Dashboard card drop shadow size. */
   "dashcard.shadow"?: DashCardShadowSize;
 
