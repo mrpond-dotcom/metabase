@@ -488,6 +488,8 @@ describe("DashCard", () => {
   });
 
   describe("card style", () => {
+    beforeAll(() => loadVisualizationComponents(["table"]));
+
     it("should paint the chosen background color and opacity", () => {
       const styledDashcard = createMockDashboardCard({
         ...tableDashcard,

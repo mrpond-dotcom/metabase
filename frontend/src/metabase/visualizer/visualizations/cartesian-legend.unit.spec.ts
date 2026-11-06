@@ -1,4 +1,5 @@
 import type { VisualizerVizDefinitionWithColumns } from "metabase/redux/store/visualizer";
+import { registerVisualizations } from "metabase/visualizations/register";
 import type {
   DatasetColumn,
   VisualizationDisplay,
@@ -21,6 +22,8 @@ import {
   canSetLegendColumnForCartesianChart,
   setLegendColumnForCartesianChart,
 } from "./cartesian";
+
+registerVisualizations();
 
 const dataSource = createDataSource("card", 1, "Orders");
 const otherDataSource = createDataSource("card", 2, "Products");
