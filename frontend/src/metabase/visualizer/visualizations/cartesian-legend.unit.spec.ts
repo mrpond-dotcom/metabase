@@ -32,7 +32,12 @@ const createdAtColumn = createMockDatetimeColumn({ id: 1, name: "CREATED_AT" });
 const countColumn = createMockNumericColumn({ id: 2, name: "count" });
 const categoryColumn = createMockCategoryColumn({ id: 3, name: "CATEGORY" });
 const vendorColumn = createMockCategoryColumn({ id: 4, name: "VENDOR" });
-const averageColumn = createMockNumericColumn({ id: 5, name: "avg" });
+// an aggregated metric; raw numeric columns count as dimensions, like on the x-axis
+const averageColumn = createMockNumericColumn({
+  id: 5,
+  name: "avg",
+  source: "aggregation",
+});
 
 interface SetupOpts {
   display?: VisualizationDisplay;
